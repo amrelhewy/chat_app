@@ -1,0 +1,51 @@
+version: "3.9"
+volumes:
+  chat_app_db:
+  bundle:
+  test_chat_app_db:
+  redis_data:
+services:
+  db: &database
+    container_name: development_chat_app_db
+    image: mariadb:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DEVELOPMENT_CHAT_APP_PASSWORD}
+      MYSQL_USER: ${DEVELOPMENT_CHAT_APP_USER}
+      MYSQL_PASSWORD: ${DEVELOPMENT_CHAT_APP_PASSWORD}
+      MYSQL_DATABASE: ${DEVELOPMENT_CHAT_APP_DATABASE}
+    volumes:
+      - chat_app_db:/var/lib/mysql
+  test_db:
+    <<: *database
+    container_name: test_chat_app_db
+    environment:
+       MYSQL_ROOT_PASSWORD: ${TEST_CHAT_APP_PASSWORD}
+       MYSQL_USER: ${TEST_CHAT_APP_USER}
+       MYSQL_PASSWORD: ${TEST_CHAT_APP_PASSWORD}
+       MYSQL_DATABASE: ${TEST_CHAT_APP_DATABASE}
+    volumes:
+      - test_chat_app_db:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    restart: always
+
+  web:
+    container_name: chat_app
+    build: .
+    env_file: .env
+    command: bundle exec rails server -b 0.0.0.0
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/chat_app
+      - bundle:/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - test_db
+      - redis
