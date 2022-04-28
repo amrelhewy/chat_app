@@ -41,7 +41,8 @@ module Api
 
       # Use callbacks to share common setup or constraints between actions.
       def set_chat_application
-        @chat_application = ChatApplication.find(params[:token])
+        @chat_application = ChatApplication.find_by(token: params[:token])
+        render json: { message: 'Chat Application Not Found ' }, status: :not_found if @chat_application.blank?
       end
 
       # Only allow a trusted parameter "white list" through.

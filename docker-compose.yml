@@ -37,7 +37,7 @@ services:
     container_name: chat_app
     build: .
     env_file: .env
-    command: bundle exec rails server -b 0.0.0.0
+    command: bash -c "rm -f /chat_app/tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
     tty: true
     stdin_open: true
     volumes:

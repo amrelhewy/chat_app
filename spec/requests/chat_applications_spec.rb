@@ -20,12 +20,13 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
         tags 'Chat Applications'
         produces 'application/json'
         response '200', 'Successfull' do
-          examples 'application/json' => [{ token: 1, name: 'test_name' }, { token: 2, name: 'test_name_2' }]
+          examples 'application/json' => [{ token: 'xsad43a2awd', name: 'test_name' },
+                                          { token: 'hfdg44234d', name: 'test_name_2' }]
           it 'renders a successful response' do
             get api_v1_chat_applications_path, as: :json
             expect(response).to have_http_status(:ok)
             body = response.parsed_body
-            expect(body.first['token']).to eq(chat_application.id)
+            expect(body.first['token']).to eq(chat_application.token)
             expect(body.first['name']).to eq(chat_application.name)
           end
         end
@@ -40,13 +41,20 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
         tags 'Chat Applications'
         parameter name: :token, in: :path, type: :string
         response '200', 'Chat Application Found' do
-          examples 'application/json' => { token: 1, name: 'test_name' }
+          examples 'application/json' => { token: '231gasjJsda', name: 'test_name' }
           it 'renders a successful response' do
-            get api_v1_chat_application_path(chat_application), as: :json
+            get api_v1_chat_application_path(chat_application.token), as: :json
             expect(response).to be_successful
             body = response.parsed_body
-            expect(body['token']).to eq(chat_application.id)
+            expect(body['token']).to eq(chat_application.token)
             expect(body['name']).to eq(chat_application.name)
+          end
+        end
+        response '404', 'Chat Application Not Found' do
+          examples 'application/json' => { token: '231gasjJsda', name: 'test_name' }
+          it 'renders a not found response' do
+            get api_v1_chat_application_path(chat_application), as: :json
+            expect(response).to have_http_status(:not_found)
           end
         end
       end
@@ -143,14 +151,14 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
           }
           response '200', 'Successfully updated' do
             it 'updates the requested chat_application' do
-              patch api_v1_chat_application_path(chat_application),
+              patch api_v1_chat_application_path(chat_application.token),
                     params: { chat_application: new_attributes }, as: :json
               chat_application.reload
               expect(chat_application.name).to eq(new_attributes['name'])
             end
 
             it 'renders a JSON response with the chat_application' do
-              patch api_v1_chat_application_path(chat_application),
+              patch api_v1_chat_application_path(chat_application.token),
                     params: { chat_application: new_attributes }, as: :json
               expect(response).to have_http_status(:ok)
               expect(response.content_type).to match(a_string_including('application/json'))
@@ -178,10 +186,18 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
           }
           response '400', 'Failed to update' do
             it 'renders a JSON response with errors for the chat_application' do
-              patch api_v1_chat_application_path(chat_application),
+              patch api_v1_chat_application_path(chat_application.token),
                     params: { chat_application: invalid_attributes }, as: :json
               expect(response).to have_http_status(:unprocessable_entity)
               expect(response.content_type).to eq('application/json')
+            end
+          end
+
+          response '404', 'Chat Application Not Found' do
+            it 'returns a not found response' do
+              patch api_v1_chat_application_path(chat_application),
+                    params: { chat_application: invalid_attributes }, as: :json
+              expect(response).to have_http_status(:not_found)
             end
           end
         end
