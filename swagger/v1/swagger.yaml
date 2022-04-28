@@ -15,12 +15,12 @@ paths:
           content:
             application/json:
               example:
-              - token: 1
+              - token: xsad43a2awd
                 name: test_name
-              - token: 2
+              - token: hfdg44234d
                 name: test_name_2
     post:
-      summary: Creates a Chat Application
+      summary: Creates a chat application
       tags:
       - Chat Applications
       parameters: []
@@ -56,7 +56,14 @@ paths:
           content:
             application/json:
               example:
-                token: 1
+                token: 231gasjJsda
+                name: test_name
+        '404':
+          description: Chat Application Not Found
+          content:
+            application/json:
+              example:
+                token: 231gasjJsda
                 name: test_name
     patch:
       summary: Updates existing Chat Application
@@ -71,8 +78,10 @@ paths:
       responses:
         '200':
           description: Successfully updated
-        '400':
-          description: Failed to update
+        '422':
+          description: Unprocessable Entity
+        '404':
+          description: Chat Application Not Found
       requestBody:
         content:
           application/json:

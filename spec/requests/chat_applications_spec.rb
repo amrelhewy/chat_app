@@ -62,19 +62,19 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
   end
 
   describe 'POST /create' do
-    context 'with valid parameters' do
-      path '/api/v1/chat_applications' do
-        post 'Creates a chat application' do
-          consumes 'application/json'
-          produces 'application/json'
-          tags 'Chat Applications'
-          parameter name: :chat_application, in: :body, schema: {
-            type: :object,
-            properties: {
-              name: { type: :string }
-            },
-            required: ['name']
-          }
+    path '/api/v1/chat_applications' do
+      post 'Creates a chat application' do
+        consumes 'application/json'
+        produces 'application/json'
+        tags 'Chat Applications'
+        parameter name: :chat_application, in: :body, schema: {
+          type: :object,
+          properties: {
+            name: { type: :string }
+          },
+          required: ['name']
+        }
+        context 'with valid parameters' do
           response '201', 'Chat Application Created' do
             it 'creates a new ChatApplication' do
               expect do
@@ -93,22 +93,8 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
             end
           end
         end
-      end
-    end
 
-    context 'with invalid parameters' do
-      path '/api/v1/chat_applications' do
-        post 'Creates a Chat Application' do
-          consumes 'application/json'
-          produces 'application/json'
-          tags 'Chat Applications'
-          parameter name: :chat_application, in: :body, schema: {
-            type: :object,
-            properties: {
-              name: { type: :string }
-            },
-            required: ['name']
-          }
+        context 'with invalid parameters' do
           response '401', 'Unprocessable Entity' do
             it 'does not create a new ChatApplication' do
               expect do
@@ -130,25 +116,25 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
   end
 
   describe 'PATCH /update' do
-    context 'with valid parameters' do
-      let(:new_attributes) do
-        { 'name' => 'new_name' }
-      end
-      let!(:chat_application) { create(:chat_application) }
+    path '/api/v1/chat_applications/{token}' do
+      patch 'Updates existing Chat Application' do
+        tags 'Chat Applications'
+        consumes 'application/json'
+        produces 'application/json'
+        parameter name: :token, in: :path, type: :string
+        parameter name: :chat_application, in: :body, schema: {
+          type: :object,
+          properties: {
+            name: { type: :string }
+          },
+          required: ['name']
+        }
+        context 'with valid parameters' do
+          let(:new_attributes) do
+            { 'name' => 'new_name' }
+          end
+          let!(:chat_application) { create(:chat_application) }
 
-      path '/api/v1/chat_applications/{token}' do
-        patch 'Updates existing Chat Application' do
-          tags 'Chat Applications'
-          consumes 'application/json'
-          produces 'application/json'
-          parameter name: :token, in: :path, type: :string
-          parameter name: :chat_application, in: :body, schema: {
-            type: :object,
-            properties: {
-              name: { type: :string }
-            },
-            required: ['name']
-          }
           response '200', 'Successfully updated' do
             it 'updates the requested chat_application' do
               patch api_v1_chat_application_path(chat_application.token),
@@ -167,24 +153,9 @@ RSpec.describe '/api/v1/chat_applications', type: :request do
             end
           end
         end
-      end
-    end
 
-    context 'with invalid parameters' do
-      path '/api/v1/chat_applications/{token}' do
-        patch 'Updates existing Chat Application' do
-          tags 'Chat Applications'
-          consumes 'application/json'
-          produces 'application/json'
-          parameter name: :token, in: :path, type: :string
-          parameter name: :chat_application, in: :body, schema: {
-            type: :object,
-            properties: {
-              name: { type: :string }
-            },
-            required: ['name']
-          }
-          response '400', 'Failed to update' do
+        context 'with invalid parameters' do
+          response '422', 'Unprocessable Entity' do
             it 'renders a JSON response with errors for the chat_application' do
               patch api_v1_chat_application_path(chat_application.token),
                     params: { chat_application: invalid_attributes }, as: :json

@@ -20,10 +20,14 @@ module Api
       # POST /chat_applications
       def create
         @chat_application = ChatApplication.new(chat_application_params)
-
-        if @chat_application.save
+        # A possible write skew could happen due to has_secure_token
+        # Therefore we added a unique index on it
+        begin
+          @chat_application.save!
           render json: ChatApplicationBlueprint.render(@chat_application), status: :created
-        else
+        rescue ActiveRecord::RecordNotUnique
+          retry # retry if the token was coincidentally the same concurrently so the user doesn't feel anything
+        rescue ActiveRecord::RecordInvalid
           render json: @chat_application.errors, status: :unprocessable_entity
         end
       end
