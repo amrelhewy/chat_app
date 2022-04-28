@@ -5,6 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.1'
 
+gem 'blueprinter', '~> 0.25.3'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.7', '>= 5.2.7.1'
 # Use mysql as the database for Active Record
@@ -42,6 +43,7 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'factory_bot_rails', '~> 6.2.0'
   gem 'rspec-rails', '~> 4.1.0'
+  gem 'shoulda-matchers', '~> 5.0'
 end
 
 group :development do

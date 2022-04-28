@@ -62,8 +62,12 @@ Lint/UnmodifiedReduceAccumulator:
   Enabled: true
 Lint/UselessRuby2Keywords:
   Enabled: true
+Metrics/BlockLength:
+  Enabled: false
 Naming/BlockForwarding:
   Enabled: true
+Naming/FileName:
+  Enabled: false
 Security/CompoundHash:
   Enabled: true
 Security/IoMethods:
@@ -72,6 +76,8 @@ Style/ArgumentsForwarding:
   Enabled: true
 Style/CollectionCompact:
   Enabled: true
+Style/Documentation:
+  Enabled: false
 Style/DocumentDynamicEvalDefinition:
   Enabled: true
 Style/EndlessMethod:
@@ -158,6 +164,8 @@ Rails/Inquiry:
   Enabled: true
 Rails/MailerName:
   Enabled: true
+Rails/FilePath:
+  Enabled: false
 Rails/MatchRoute:
   Enabled: true
 Rails/MigrationClassName:
@@ -236,6 +244,8 @@ RSpec/BeNil:
   Enabled: true
 RSpec/ExcessiveDocstringSpacing:
   Enabled: true
+RSpec/MultipleExpectations:
+  Enabled: false
 RSpec/IdenticalEqualityAssertion:
   Enabled: true
 RSpec/SubjectDeclaration:
@@ -246,3 +256,5 @@ RSpec/FactoryBot/SyntaxMethods:
   Enabled: true
 RSpec/Rails/AvoidSetupHook:
   Enabled: true
+RSpec/ExampleLength:
+  Max: 6

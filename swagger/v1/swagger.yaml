@@ -1,0 +1,85 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/chat_applications":
+    get:
+      summary: Returns all applications
+      tags:
+      - Chat Applications
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              example:
+              - token: 1
+                name: test_name
+              - token: 2
+                name: test_name_2
+    post:
+      summary: Creates a Chat Application
+      tags:
+      - Chat Applications
+      parameters: []
+      responses:
+        '201':
+          description: Chat Application Created
+        '401':
+          description: Unprocessable Entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+              - name
+  "/api/v1/chat_applications/{token}":
+    get:
+      summary: Retreives a chat application
+      tags:
+      - Chat Applications
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Chat Application Found
+          content:
+            application/json:
+              example:
+                token: 1
+                name: test_name
+    patch:
+      summary: Updates existing Chat Application
+      tags:
+      - Chat Applications
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully updated
+        '400':
+          description: Failed to update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+              - name
