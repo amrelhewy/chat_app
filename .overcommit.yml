@@ -26,3 +26,7 @@ PreCommit:
  TrailingWhitespace:
     enabled: true
 
+PrePush:
+  RSpec:
+    enabled: true
+    command: ["bundle", "exec", "rspec"]
