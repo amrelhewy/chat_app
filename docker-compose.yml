@@ -27,13 +27,16 @@ services:
     volumes:
       - test_chat_app_db:/var/lib/mysql
 
-  redis:
+  redis: &redis
     image: redis:latest
     volumes:
       - redis_data:/data
     restart: always
 
-  web:
+  redis_test:
+    <<: *redis
+    volumes: []
+  web: &rails_app
     container_name: chat_app
     build: .
     env_file: .env
@@ -49,3 +52,9 @@ services:
       - db
       - test_db
       - redis
+
+  worker:
+    <<: *rails_app
+    container_name: sidekiq_worker
+    command: bundle exec sidekiq
+    ports: []

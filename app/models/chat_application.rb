@@ -16,6 +16,12 @@
 #
 class ChatApplication < ApplicationRecord
   has_secure_token
+
+  # Associations
+  has_many :chats, primary_key: :token, foreign_key: :chat_application_token, dependent: :destroy,
+                   inverse_of: :chat_application
+
+  # Validations
   validates :name, presence: true
   validates :token, uniqueness: true
 end

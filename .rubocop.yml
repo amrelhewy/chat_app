@@ -86,6 +86,8 @@ Style/FetchEnvVar:
   Enabled: true
 Style/FileRead:
   Enabled: true
+Style/GuardClause:
+  Enabled: false
 Style/FileWrite:
   Enabled: true
 Style/HashConversion:

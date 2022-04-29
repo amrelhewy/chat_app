@@ -21,6 +21,7 @@ RSpec.describe ChatApplication, type: :model do
 
   it { is_expected.to validate_presence_of(:name) }
   it { is_expected.to validate_uniqueness_of(:token) }
+  it { is_expected.to have_many(:chats) }
 
   it 'has a valid factory' do
     expect(build(:chat_application)).to be_valid

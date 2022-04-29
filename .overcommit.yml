@@ -16,6 +16,8 @@
 # Uncomment the following lines to make the configuration take effect.
 gemfile: Gemfile
 PreCommit:
+ Brakeman:
+    enabled: true
  BundleCheck:
     enabled: true
  RuboCop:
