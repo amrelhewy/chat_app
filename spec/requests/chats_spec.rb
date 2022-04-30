@@ -15,17 +15,6 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
-  # This should return the minimal set of attributes required to create a valid
-  # Chat. As you add validations to Chat, be sure to
-  # adjust the attributes here as well.
-  let(:valid_attributes) do
-    skip('Add a hash of attributes valid for your model')
-  end
-
-  let(:invalid_attributes) do
-    skip('Add a hash of attributes invalid for your model')
-  end
-
   describe 'GET /index' do
     path '/api/v1/chat_applications/{chat_application_token}/chats' do
       get 'Retrieves all chats belonging to a specific application' do
@@ -42,11 +31,11 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
             expect(body.first['number']).to eq(chat.number)
           end
 
-          it 'renders an empty array if token is invalid' do
+          it 'returns a bad request if an invalid chat app token was provided' do
             get api_v1_chat_application_chats_path('invalid_token'), as: :json
-            expect(response).to have_http_status(:ok)
+            expect(response).to have_http_status(:bad_request)
             body = response.parsed_body
-            expect(body.size).to eq(0)
+            expect(body['message']).to eq("Chat Application doesn't exist")
           end
         end
       end
@@ -75,7 +64,7 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
 
           it 'Successfully adds the key value pair to redis where key is token and val is latest chat number' do
             post api_v1_chat_application_chats_path(chat_application.token)
-            latest_chat_number = REDIS.get(chat_application.token)
+            latest_chat_number = REDIS.get("chat_app_#{chat_application.id}")
             expect(latest_chat_number).to eq('1')
           end
 
@@ -88,7 +77,7 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
           it 'Successfully increments the chat number on every new chat per token creation' do
             3.times do |i|
               post api_v1_chat_application_chats_path(chat_application.token)
-              expect(REDIS.get(chat_application.token)).to eq((i + 1).to_s)
+              expect(REDIS.get("chat_app_#{chat_application.id}")).to eq((i + 1).to_s)
             end
           end
         end
@@ -99,6 +88,29 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
             expect(response).to have_http_status(:bad_request)
             body = response.parsed_body
             expect(body['message']).to eq("Chat Application doesn't exist")
+          end
+        end
+
+        context 'when reids is down Fallback to database happens' do
+          before do
+            allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return false
+            allow_any_instance_of(ChatCreationService).to receive(:latest_chat_number).and_raise(SocketError)
+          end
+
+          it "Successfully creates a chat whilst redis isn't operating" do
+            3.times do |n|
+              post api_v1_chat_application_chats_path(chat_application.token)
+              expect(chat_application.chats.count).to eq(n + 1)
+            end
+          end
+
+          it 'Successfully syncs with redis and creates a chat' do
+            post api_v1_chat_application_chats_path(chat_application.token)
+            expect(chat_application.chats.count).to eq(1)
+            allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return true
+            allow_any_instance_of(ChatCreationService).to receive(:latest_chat_number).and_call_original
+            post api_v1_chat_application_chats_path(chat_application.token)
+            expect(REDIS.get("chat_app_#{chat_application.id}")).to eq('2')
           end
         end
       end
