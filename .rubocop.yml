@@ -240,6 +240,8 @@ Performance/StringInclude:
   Enabled: true
 Performance/Sum:
   Enabled: true
+RSpec/AnyInstance:
+ Enabled: false
 RSpec/BeEq:
   Enabled: true
 RSpec/BeNil:

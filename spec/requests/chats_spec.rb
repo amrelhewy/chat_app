@@ -101,6 +101,29 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
             expect(body['message']).to eq("Chat Application doesn't exist")
           end
         end
+
+        context 'when reids is down Fallback to database happens' do
+          before do
+            allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return false
+            allow_any_instance_of(ChatCreationService).to receive(:latest_chat_number).and_raise(SocketError)
+          end
+
+          it "Successfully creates a chat whilst redis isn't operating" do
+            3.times do |n|
+              post api_v1_chat_application_chats_path(chat_application.token)
+              expect(chat_application.chats.count).to eq(n + 1)
+            end
+          end
+
+          it 'Successfully syncs with redis and creates a chat' do
+            post api_v1_chat_application_chats_path(chat_application.token)
+            expect(chat_application.chats.count).to eq(1)
+            RSpec::Mocks.space.proxy_for(RedisHelper).reset
+            RSpec::Mocks.space.proxy_for(ChatCreationService).reset
+            post api_v1_chat_application_chats_path(chat_application.token)
+            expect(chat_application.chats.count).to eq(2)
+          end
+        end
       end
     end
   end
