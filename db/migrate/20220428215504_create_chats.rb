@@ -5,9 +5,9 @@ class CreateChats < ActiveRecord::Migration[5.2]
     create_table :chats do |t|
       t.integer :number
       # Index is for selecting all chats belonging to one app
-      t.string :chat_application_token, null: false, index: true
+      t.references :chat_application, null: false, index: true
       t.timestamps
     end
-    add_index :chats, %i[chat_application_token number], unique: true
+    add_index :chats, %i[chat_application_id number], unique: true
   end
 end
