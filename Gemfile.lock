@@ -159,6 +159,9 @@ GEM
       rspec-expectations (~> 3.10)
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
+    rspec-sidekiq (3.1.0)
+      rspec-core (~> 3.0, >= 3.0.0)
+      sidekiq (>= 2.4.0)
     rspec-support (3.11.0)
     rswag (2.5.1)
       rswag-api (= 2.5.1)
@@ -244,6 +247,7 @@ DEPENDENCIES
   rails (~> 5.2.7, >= 5.2.7.1)
   redis (~> 4.0)
   rspec-rails (~> 4.1.0)
+  rspec-sidekiq
   rswag
   rubocop (= 1.28.2)
   rubocop-performance (= 1.13.3)

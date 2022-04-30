@@ -2,6 +2,8 @@
 
 require 'rails_helper'
 RSpec.describe ChatCreationJob, type: :job do
+  it { is_expected.to be_processed_in :chat_creation_queue }
+
   it 'Successfully persists the chat in the database' do
     chat_application = create(:chat_application)
     job = described_class.new

@@ -115,5 +115,15 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
         end
       end
     end
+    context 'when creating a chat chats_count updates regularly' do
+      it 'Successfully updates chats_count after creating a chat - deferred mode' do
+        Sidekiq::Testing.inline! do
+          chat_application = create(:chat_application)
+          post api_v1_chat_application_chats_path(chat_application.token)
+          chat_application.reload
+          expect(chat_application.chats_count).to eq(1)
+        end
+      end
+    end
   end
 end

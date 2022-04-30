@@ -22,7 +22,6 @@ gem 'sidekiq-unique-jobs', '~> 7.1.21'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 gem 'counter-cache'
-
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
 
@@ -46,6 +45,7 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'factory_bot_rails', '~> 6.2.0'
   gem 'rspec-rails', '~> 4.1.0'
+  gem 'rspec-sidekiq', require: false
   gem 'shoulda-matchers', '~> 5.0'
 end
 
