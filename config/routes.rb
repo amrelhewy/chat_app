@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :chat_applications, param: :token, except: %i[destroy] do
-        resources :chats, param: :number, except: %i[destroy update show]
+        resources :chats, param: :number, except: %i[destroy update show] do
+          resources :messages, param: :message_number, except: %i[destroy update show]
+        end
       end
     end
   end

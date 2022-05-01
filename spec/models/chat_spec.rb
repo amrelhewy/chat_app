@@ -21,6 +21,7 @@ RSpec.describe Chat, type: :model do
   subject { build(:chat) }
 
   it { is_expected.to belong_to(:chat_application) }
+  it { is_expected.to have_many(:messages) }
   it { is_expected.to validate_presence_of(:number) }
   it { is_expected.to validate_uniqueness_of(:number).scoped_to(:chat_application_id) }
 

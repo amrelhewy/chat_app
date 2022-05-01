@@ -16,6 +16,8 @@ Layout/LineEndStringConcatenationIndentation:
   Enabled: true
 Layout/SpaceBeforeBrackets:
   Enabled: true
+Layout/LineLength:
+  Max: 130
 Lint/AmbiguousAssignment:
   Enabled: true
 Lint/AmbiguousOperatorPrecedence:
@@ -261,4 +263,4 @@ RSpec/FactoryBot/SyntaxMethods:
 RSpec/Rails/AvoidSetupHook:
   Enabled: true
 RSpec/ExampleLength:
-  Max: 6
+  Max: 10

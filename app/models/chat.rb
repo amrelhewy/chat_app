@@ -21,6 +21,7 @@ class Chat < ApplicationRecord
 
   # Associations
   belongs_to :chat_application
+  has_many :messages, dependent: :destroy
 
   # Counter Cache
   counter_cache_on column: :chats_count,

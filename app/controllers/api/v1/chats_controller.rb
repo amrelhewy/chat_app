@@ -4,9 +4,10 @@ module Api
   module V1
     class ChatsController < ApplicationController
       include RedisHelper
-      before_action :find_chat_application, only: %i[create index]
+      before_action :find_chat_application
       before_action :check_sync_status, only: :create
-      rescue_from SocketError, with: :fallback_to_database # If redis went down
+      rescue_from SocketError, with: :fallback_to_database # If redis went down, down the redis container to test
+      # There might be other errors like a timeout, etc. i just did this one for simplicity and easieness of testing
 
       # GET /api/v1/chat_applications/:chat_application_token/chats
       def index
@@ -15,7 +16,7 @@ module Api
 
       # POST /api/v1/chat_applications/:chat_application_token/chats
       def create
-        chat_number = ChatCreationService.new(@chat_application.id).latest_chat_number
+        chat_number = CreationService.new(:chat).latest_chat_number("chat_app_#{@chat_application.id}")
 
         ChatCreationJob.perform_async(@chat_application.id, chat_number)
 
