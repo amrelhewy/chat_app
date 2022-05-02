@@ -79,7 +79,7 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
           end
         end
 
-        context 'when reids is down Fallback to database happens' do
+        context 'when redis is down Fallback to database happens' do
           before do
             allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return false
             allow_any_instance_of(CreationService).to receive(:latest_chat_number).and_raise(SocketError)
@@ -104,7 +104,7 @@ RSpec.describe '/api/v1/:chat_application_token/chats', type: :request do
       end
     end
     context 'when creating a chat chats_count updates regularly' do
-      it 'Successfully updates chats_count after creating a chat - deferred mode' do
+      it 'Successfully updates chats_count after creating a chat' do
         Sidekiq::Testing.inline! do
           chat_application = create(:chat_application)
           post api_v1_chat_application_chats_path(chat_application.token)

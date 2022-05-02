@@ -111,6 +111,44 @@ RSpec.describe '/api/v1#messages', type: :request do
             expect(body['message']).to eq('Message body is empty')
           end
         end
+
+        context 'when redis is down Fallback to database happens' do
+          before do
+            allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return false
+            allow_any_instance_of(CreationService).to receive(:latest_message_number).and_raise(SocketError)
+          end
+
+          it "Successfully creates a message whilst redis isn't operating" do
+            3.times do |n|
+              post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
+                   params: valid_params, as: :json
+              expect(chat.messages.count).to eq(n + 1)
+            end
+          end
+
+          it 'Successfully syncs with redis and creates a chat' do
+            post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
+                 params: valid_params, as: :json
+            expect(chat.messages.count).to eq(1)
+            allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return true
+            allow_any_instance_of(CreationService).to receive(:latest_message_number).and_call_original
+            post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
+                 params: valid_params, as: :json
+            expect(REDIS.get("chat_app_#{chat.chat_application.id}_chat_#{chat.id}")).to eq('2')
+          end
+        end
+
+        context 'when creating a message messages_count updates regularly' do
+          it 'Successfully updates messages_count after creating a message' do
+            Sidekiq::Testing.inline! do
+              chat = create(:chat)
+              post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
+                   params: valid_params, as: :json
+              chat.reload
+              expect(chat.messages_count).to eq(1)
+            end
+          end
+        end
       end
     end
   end

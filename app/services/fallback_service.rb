@@ -1,24 +1,32 @@
 # frozen_string_literal: true
 
 class FallbackService
-  def initialize(chat_application_id)
-    @chat_application_id = chat_application_id
+  TO_BE_CREATED = %w[chat message].freeze
+  def initialize(association, association_id, extras)
+    @association = association
+    @association_id = association_id
+    @extras = extras
   end
 
-  def fallback_to_database_and_create_chat
-    @latest_chat = ChatApplication.find_by(id: @chat_application_id).chats.last
-    latest_chat_number = @latest_chat.present? ? @latest_chat.number : 0 # First chat in this application
-    # Create the chat -- this is obviously much slower than redis and sidekiq
-    # but this guarantees reliabillity in case redis went down.
-    Chat.create!(number: latest_chat_number + 1, chat_application_id: @chat_application_id)
-  rescue ActiveRecord::RecordNotUnique
-    retry # since there is a unique index on chat number and token. retry the process if any race conditions occur
-  end
+  # this is obviously much slower than redis and sidekiq
+  # but this guarantees reliabillity in case redis went down.
+  # since there is a unique index on chat number and token. retry the process if any race conditions occur
+  TO_BE_CREATED.each do |c|
+    define_method("fallback_to_database_and_create_#{c}") do
+      latest_created = @association.constantize.find_by(id: @association_id).send(c.pluralize).last # last chat or message
+      latest_created_number = latest_created.present? ? latest_created.number : 0
+      params = { number: latest_created_number + 1 }
+      params["#{@association.underscore}_id"] = @association_id # either chat or chat application the foreign key always
+      c.classify.constantize.create!(number: latest_created_number + 1, **params.merge!(@extras))
+    rescue ActiveRecord::RecordNotUnique
+      retry
+    end
 
-  def sync_redis_chat_number
-    @latest_chat = ChatApplication.find_by(id: @chat_application_id).chats.last
-    REDIS.set("chat_app_#{@chat_application_id}", @latest_chat.number)
-    @latest_chat.chat_application.redis_synced = true
-    @latest_chat.chat_application.save
+    define_method("sync_redis_#{c}_number") do |redis_key|
+      latest_created = @association.constantize.find_by(id: @association_id).send(c.pluralize).last
+      REDIS.set(redis_key, latest_created.number)
+      latest_created.send(@association.underscore).redis_synced = true
+      latest_created.send(@association.underscore).save
+    end
   end
 end

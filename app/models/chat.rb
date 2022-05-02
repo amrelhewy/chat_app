@@ -5,7 +5,10 @@
 # Table name: chats
 #
 #  id                  :bigint           not null, primary key
+#  messages_count      :bigint           default(0), not null
+#  messages_updated_at :date
 #  number              :integer
+#  redis_synced        :boolean          default(TRUE)
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  chat_application_id :bigint           not null
@@ -29,8 +32,9 @@ class Chat < ApplicationRecord
                    relation_class_name: 'ChatApplication',
                    method: :calculate_chats_count,
                    touch_column: :chats_updated_at,
-                   wait: 5.minutes, # updates redis every 5 minutes with the current count.
+                   wait: 5.minutes, # updates redis every 5 minutes with the current count. redis job once every 5 min
                    # recalculates from database every hour
+                   recalculation: true,
                    if: proc { redis_running? }
   # Validations
   validates :number, presence: true

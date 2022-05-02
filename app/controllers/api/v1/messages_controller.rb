@@ -4,9 +4,8 @@ module Api
   module V1
     class MessagesController < ApplicationController
       before_action :find_chat
-      # before_action :check_sync_status, only: :create
       before_action :validate_presence_of_message_body, only: :create
-      rescue_from SocketError, with: :fallback_to_database
+      include RedisRecoverable
       # GET /api/v1/chat_applications/:chat_application_token/chats/:chat_number/messages
       def index
         @messages = @chat.messages
@@ -16,13 +15,18 @@ module Api
 
       # POST /api/v1/chat_applications/:chat_application_token/chats/:chat_number/messages
       def create
-        message_number = CreationService.new(:message).latest_message_number("chat_app_#{@chat_application.id}_chat_#{@chat.id}")
+        redis_key = "chat_app_#{@chat_application.id}_chat_#{@chat.id}"
+        check_redis_sync_status @chat, redis_key
+
+        message_number = CreationService.new(:message).latest_message_number(redis_key)
 
         MessageCreationJob.perform_async(message_params[:body], message_number, @chat.id)
 
         @message = @chat.messages.new(body: message_params[:body], number: message_number)
 
         render json: MessageBlueprint.render(@message), status: :created
+      rescue Redis::CannotConnectError, SocketError
+        fallback_to_database @chat, message_params
       end
 
       private

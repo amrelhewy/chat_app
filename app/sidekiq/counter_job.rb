@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ChatCounterJob
+class CounterJob
   include Sidekiq::Job
 
   sidekiq_options lock: :until_executed
