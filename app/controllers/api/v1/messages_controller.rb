@@ -6,11 +6,15 @@ module Api
       before_action :find_chat
       before_action :validate_presence_of_message_body, only: :create
       include RedisRecoverable
-      # GET /api/v1/chat_applications/:chat_application_token/chats/:chat_number/messages
+      # GET /api/v1/chat_applications/:chat_application_token/chats/:chat_number/messages?query=
       def index
-        @messages = @chat.messages
-
-        render json: MessageBlueprint.render(@messages)
+        if params[:query].present?
+          @messages =  Message.search(params[:query], @chat.id).results
+          render json: @messages, status: :ok
+        else
+          @messages = @chat.messages
+          render json: MessageBlueprint.render(@messages), status: :ok
+        end
       end
 
       # POST /api/v1/chat_applications/:chat_application_token/chats/:chat_number/messages

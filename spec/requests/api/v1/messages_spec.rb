@@ -5,13 +5,24 @@ require 'rails_helper'
 RSpec.describe '/api/v1#messages', type: :request do
   describe 'GET /index' do
     let!(:message) { create(:message) }
+    let(:valid_params) { { message: { body: 'Just bought a new pair of sneakers' } } }
 
-    path '/api/v1/chat_applications/{chat_application_token}/chats/{chat_number}' do
+    before do
+      Message.__elasticsearch__.create_index! force: true
+    end
+
+    after do
+      Message.__elasticsearch__.client.indices.delete index: Message.index_name
+    end
+
+    path '/api/v1/chat_applications/{chat_application_token}/chats/{chat_number}/messages' do
       get 'Retrieves all messages belonging to a specific chat' do
         produces 'application/json'
         tags 'Messages'
         parameter name: :chat_application_token, in: :path, type: :string
         parameter name: :chat_number, in: :path, type: :string
+        parameter name: :query, in: :query, type: :string, min_length: 3,
+                  description: 'Searching through messages belonging to chat'
         response '200', 'Get messages' do
           examples 'application/json' => [{ number: 1, body: 'Message#1' }, { number: 2, body: 'Message#2' }]
           it 'renders a successful response' do
@@ -22,6 +33,19 @@ RSpec.describe '/api/v1#messages', type: :request do
             expect(body.first['number']).to eq(message.number)
             expect(body.first['body']).to eq(message.body)
           end
+          # it 'Successfully searches for a created message', skip: true do
+          #   Sidekiq::Testing.inline! do
+          #     post api_v1_chat_application_chat_messages_path(message.chat.chat_application.token, message.chat.number),
+          #     params: valid_params, as: :json
+
+          #     get api_v1_chat_application_chat_messages_path(message.chat.chat_application.token, message.chat.number),
+          #     params: { query: 'sneakers' }
+          #     expect(response).to have_http_status(:ok)
+
+          #     body = response.parsed_body
+          #     expect(body.first["_source"]["body"]).to eq(valid_params[:message][:body])
+          #   end
+          # end
         end
 
         response '400', 'Chat not found' do
@@ -46,15 +70,21 @@ RSpec.describe '/api/v1#messages', type: :request do
     let(:invalid_params) { { message: { body: '' } } }
     let(:chat) { create(:chat) }
 
-    path '/api/v1/chat_applications/{chat_application_token}/chats/{chat_number}' do
+    path '/api/v1/chat_applications/{chat_application_token}/chats/{chat_number}/messages' do
       post 'Creates a new message' do
+        consumes 'application/json'
         produces 'application/json'
         tags 'Messages'
         parameter name: :chat_application_token, in: :path, type: :string
         parameter name: :chat_number, in: :path, type: :string
-        parameter name: :body, in: :body, type: :string
+        parameter name: :message, in: :body, schema: {
+          type: :object,
+          properties: {
+            body: { type: :string }
+          }
+        }
         response '200', 'Message Created' do
-          examples 'application/json' => { number: 2, body: 'Message#2' }
+          examples 'application/json' => { number: 1, body: 'Message#1' }
           it 'successfully creates a message' do
             3.times do |n|
               post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),

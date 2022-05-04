@@ -66,6 +66,8 @@ Lint/UselessRuby2Keywords:
   Enabled: true
 Metrics/BlockLength:
   Enabled: false
+Metrics/MethodLength:
+  Max: 20
 Naming/BlockForwarding:
   Enabled: true
 Naming/FileName:

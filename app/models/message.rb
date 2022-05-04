@@ -20,6 +20,7 @@
 #  fk_rails_...  (chat_id => chats.id)
 #
 class Message < ApplicationRecord
+  include Searchable
   include Counter::Cache
   extend RedisHelper
 
@@ -32,7 +33,7 @@ class Message < ApplicationRecord
                    relation_class_name: 'Chat',
                    method: :calculate_messages_count,
                    touch_column: :messages_updated_at,
-                   wait: 10.seconds, # updates redis every 5 minutes with the current count. lock to prevent unneeded jobs
+                   wait: 5.minutes, # updates redis every 5 minutes with the current count. lock to prevent unneeded jobs
                    # recalculates from database every hour
                    recalculation: true,
                    if: proc { redis_running? }

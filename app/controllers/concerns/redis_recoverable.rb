@@ -25,6 +25,7 @@ module RedisRecoverable
     entity_to_be_created = controller_name.classify # Get either a chat or a message
 
     association.update(redis_synced: false) if association.redis_synced? # update their parent association
+    # either chat app or chat
 
     created_entity = FallbackService.new(association.class.name, association.id, extras)
                                     .send("fallback_to_database_and_create_#{entity_to_be_created.downcase}")

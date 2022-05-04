@@ -126,3 +126,70 @@ paths:
           description: Successfully created
         '400':
           description: Bad Request
+  "/api/v1/chat_applications/{chat_application_token}/chats/{chat_number}/messages":
+    get:
+      summary: Retrieves all messages belonging to a specific chat
+      tags:
+      - Messages
+      parameters:
+      - name: chat_application_token
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: chat_number
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: query
+        in: query
+        min_length: 3
+        description: Searching through messages belonging to chat
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Get messages
+          content:
+            application/json:
+              example:
+              - number: 1
+                body: Message#1
+              - number: 2
+                body: Message#2
+        '400':
+          description: Chat not found
+    post:
+      summary: Creates a new message
+      tags:
+      - Messages
+      parameters:
+      - name: chat_application_token
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: chat_number
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Message Created
+          content:
+            application/json:
+              example:
+                number: 1
+                body: Message#1
+        '400':
+          description: Chat not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string

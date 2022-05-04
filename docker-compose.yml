@@ -4,6 +4,7 @@ volumes:
   bundle:
   test_chat_app_db:
   redis_data:
+  esdata:
 services:
   db: &database
     container_name: development_chat_app_db
@@ -35,14 +36,16 @@ services:
 
   redis_test:
     <<: *redis
+    container_name: redis-test
     volumes: []
   web: &rails_app
     container_name: chat_app
     build: .
     env_file: .env
-    command: bash -c "rm -f /chat_app/tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
+    command: bash -c "bundle exec overcommit --install && bundle exec rails server -b 0.0.0.0"
     tty: true
     stdin_open: true
+    entrypoint: ["/usr/bin/entrypoint.sh"]
     volumes:
       - .:/chat_app
       - bundle:/bundle
@@ -52,9 +55,24 @@ services:
       - db
       - test_db
       - redis
+      - elastic_search
 
   worker:
     <<: *rails_app
     container_name: sidekiq_worker
     command: bundle exec sidekiq
     ports: []
+    depends_on:
+    - db
+    - test_db
+    - redis
+    - web
+  elastic_search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.3 # works for both amd and arm architectures
+    container_name: elasticsearch
+    environment:
+      - logger.level=WARN
+      - discovery.type=single-node
+      - xpack.security.enabled=false # these settings are just for the sake of the task
+    volumes:
+      - esdata:/usr/share/elasticsearch/data

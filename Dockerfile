@@ -9,7 +9,6 @@ COPY Gemfile.lock ${APP_PATH}/Gemfile.lock
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
-ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
 
 EXPOSE 3000

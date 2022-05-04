@@ -10,3 +10,4 @@
   - default
   - chat_creation_queue
   - message_creation_queue
+  - elasticsearch

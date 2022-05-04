@@ -6,5 +6,5 @@ rm -f /myapp/tmp/pids/server.pid
 
 gem install bundler
 bundle install
-bundle exec overcommit --install
+bundle exec rails db:migrate
 exec "$@"
