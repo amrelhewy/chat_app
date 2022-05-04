@@ -19,7 +19,6 @@ gem 'redis', '~> 4.0'
 gem 'sidekiq', '~> 6.4.2'
 gem 'sidekiq-unique-jobs', '~> 7.1.21'
 
-gem 'elasticsearch-extensions'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 # gem 'bcrypt', '~> 3.1.7'

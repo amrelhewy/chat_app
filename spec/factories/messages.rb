@@ -21,7 +21,7 @@
 #
 FactoryBot.define do
   factory :message do
-    body { 'MyText' }
+    body { 'This is a message i made to test elasticsearch' }
     association :chat
     sequence(:number) { |n| n }
   end

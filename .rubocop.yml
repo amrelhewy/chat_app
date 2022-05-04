@@ -265,4 +265,4 @@ RSpec/FactoryBot/SyntaxMethods:
 RSpec/Rails/AvoidSetupHook:
   Enabled: true
 RSpec/ExampleLength:
-  Max: 10
+  Max: 12

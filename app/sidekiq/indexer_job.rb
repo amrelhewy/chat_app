@@ -7,18 +7,12 @@ class IndexerJob
   Client = Elasticsearch::Client.new host: 'elasticsearch'
 
   def perform(operation, record_id)
-    logger.debug [operation, "ID: #{record_id}"]
-
     case operation.to_s
     when /index/
       record = Message.find(record_id)
-      Client.index index: 'messages', id: record_id, body: record.__elasticsearch__.as_indexed_json
+      Client.index index: "messages-#{Rails.env}", id: record_id, body: record.__elasticsearch__.as_indexed_json
     when /delete/
-      begin
-        Client.delete index: 'messages', id: record_id
-      rescue Elasticsearch::Transport::Transport::Errors::NotFound
-        logger.debug "Message not found, ID: #{record_id}"
-      end
+      Client.delete index: "messages-#{Rails.env}", id: record_id
     else raise ArgumentError, "Unknown operation '#{operation}'"
     end
   end

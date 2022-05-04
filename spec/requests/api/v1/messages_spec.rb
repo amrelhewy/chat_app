@@ -33,19 +33,31 @@ RSpec.describe '/api/v1#messages', type: :request do
             expect(body.first['number']).to eq(message.number)
             expect(body.first['body']).to eq(message.body)
           end
-          # it 'Successfully searches for a created message', skip: true do
-          #   Sidekiq::Testing.inline! do
-          #     post api_v1_chat_application_chat_messages_path(message.chat.chat_application.token, message.chat.number),
-          #     params: valid_params, as: :json
 
-          #     get api_v1_chat_application_chat_messages_path(message.chat.chat_application.token, message.chat.number),
-          #     params: { query: 'sneakers' }
-          #     expect(response).to have_http_status(:ok)
+          it 'Successfully searches for a created message' do
+            message = create(:message)
+            message.__elasticsearch__.index_document
+            sleep 1
+            get api_v1_chat_application_chat_messages_path(message.chat.chat_application.token, message.chat.number),
+                params: { query: 'elasticsearch' } # check the message factory
+            expect(response).to have_http_status(:ok)
+            body = response.parsed_body
+            expect(body.first['_source']['body']).to include('elasticsearch')
+          end
 
-          #     body = response.parsed_body
-          #     expect(body.first["_source"]["body"]).to eq(valid_params[:message][:body])
-          #   end
-          # end
+          it 'Successfully searches messages for a specific chat only' do
+            message = create(:message)
+            message.__elasticsearch__.index_document
+            other_message = create(:message) # same text different chat id
+            other_message.__elasticsearch__.index_document
+            sleep 1
+            get api_v1_chat_application_chat_messages_path(message.chat.chat_application.token, message.chat.number),
+                params: { query: 'elasticsearch' } # check the message factory
+            expect(response).to have_http_status(:ok)
+            body = response.parsed_body
+            expect(body.size).to eq(1)
+            expect(body.first['_source']['body']).to include('elasticsearch')
+          end
         end
 
         response '400', 'Chat not found' do
