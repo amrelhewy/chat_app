@@ -2,6 +2,6 @@
 
 namespace :elastic_search do
   task create_messages_index: :environment do
-    Message.__elasticsearch__.create_index!
+    Message.__elasticsearch__.create_index! force: true
   end
 end
