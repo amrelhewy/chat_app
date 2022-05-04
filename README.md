@@ -3,7 +3,7 @@
 Documentation URL : http://localhost:3000/api-docs
 
 ## Note
-The search endpoint is in the docs as the messages get with a query param
+The search endpoint is in the docs as the messages GET with a query param
 
 ## Getting the project running on local machine using Docker:
 - Copy example.env to a new file .env
