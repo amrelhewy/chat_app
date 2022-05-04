@@ -47,7 +47,6 @@ GEM
     annotate (3.2.0)
       activerecord (>= 3.2, < 8.0)
       rake (>= 10.4, < 14.0)
-    ansi (1.5.0)
     arel (9.0.0)
     ast (2.4.2)
     blueprinter (0.25.3)
@@ -70,9 +69,6 @@ GEM
       elasticsearch-transport (= 7.17.1)
     elasticsearch-api (7.17.1)
       multi_json
-    elasticsearch-extensions (0.0.33)
-      ansi
-      elasticsearch
     elasticsearch-model (7.2.1)
       activesupport (> 3)
       elasticsearch (~> 7)
@@ -283,7 +279,6 @@ DEPENDENCIES
   bootsnap (>= 1.1.0)
   byebug
   counter-cache
-  elasticsearch-extensions
   elasticsearch-model
   elasticsearch-rails
   factory_bot_rails (~> 6.2.0)

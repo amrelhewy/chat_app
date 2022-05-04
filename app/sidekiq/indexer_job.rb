@@ -4,7 +4,7 @@ class IndexerJob
   include Sidekiq::Job
   sidekiq_options queue: :elasticsearch, retry: false
 
-  Client = Elasticsearch::Client.new host: 'elasticsearch'
+  Client = Message.__elasticsearch__.client ## reuse this client instead of making a new one
 
   def perform(operation, record_id)
     case operation.to_s

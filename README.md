@@ -14,4 +14,4 @@ The search endpoint is in the docs as the messages get with a query param
 - Run `docker-compose run web bin/rspec`
 
 ## Note
-Probably it's out of the task scope but i implemented a small fallback system if redis was down in the messages and chat creation and i would love to know your opinion about it as i learn from you guys alot!
+Probably it's out of the task scope but i implemented a small fallback system if redis was down in the messages and chat creation, i know its obviously ALOT slower than the normal approach but i guaranteed some sort of reliabillity and i would love to know your opinion about it as i learn from you guys alot!

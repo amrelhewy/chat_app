@@ -30,6 +30,9 @@ module RedisRecoverable
     created_entity = FallbackService.new(association.class.name, association.id, extras)
                                     .send("fallback_to_database_and_create_#{entity_to_be_created.downcase}")
 
+    if created_entity.class.respond_to? :index_name
+      created_entity.__elasticsearch__.index_document # if it has an es index update it in ES
+    end
     render json: "#{entity_to_be_created}_blueprint".classify.constantize.render(created_entity), status: :created
   end
 end

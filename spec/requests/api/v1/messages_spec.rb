@@ -168,15 +168,17 @@ RSpec.describe '/api/v1#messages', type: :request do
             end
           end
 
-          it 'Successfully syncs with redis and creates a chat' do
-            post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
-                 params: valid_params, as: :json
-            expect(chat.messages.count).to eq(1)
+          it 'Successfully syncs with redis and creates a message' do
+            3.times do |n|
+              post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
+                   params: valid_params, as: :json
+              expect(chat.messages.count).to eq(n + 1)
+            end
             allow_any_instance_of(RedisHelper).to receive(:redis_running?).and_return true
             allow_any_instance_of(CreationService).to receive(:latest_message_number).and_call_original
             post api_v1_chat_application_chat_messages_path(chat.chat_application.token, chat.number),
                  params: valid_params, as: :json
-            expect(REDIS.get("chat_app_#{chat.chat_application.id}_chat_#{chat.id}")).to eq('2')
+            expect(REDIS.get("chat_app_#{chat.chat_application.id}_chat_#{chat.id}")).to eq('4')
           end
         end
 
