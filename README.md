@@ -15,3 +15,8 @@ The search endpoint is in the docs as the messages GET with a query param
 
 ## Note
 Probably it's out of the task scope but i implemented a small fallback system if redis was down in the messages and chat creation, i know its obviously ALOT slower than the normal approach but i guaranteed some sort of reliabillity and i would love to know your opinion about it as i learn from you guys alot!
+
+## Extra
+I've also added a CI pipeline using jenkins (i was learning jenkins so thought i'd apply on this task), also out of scope but if interested here's the link: `https://jenkins.hewi.ml`
+username: admin
+password: if interested send an email to amrelhewi@gmail.com, risky adding it here really :D
