@@ -1,6 +1,6 @@
 # Chat App
 
-Documentation URL : http://localhost:3000/api-docs
+Documentation URL : http://localhost:3000/api-docs OR https://api.hewi.ml/api-docs
 
 ## Note
 The search endpoint is in the docs as the messages GET with a query param
