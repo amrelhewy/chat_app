@@ -1,6 +1,6 @@
 # Chat App
 
-Documentation URL : http://localhost:3000/api-docs
+Documentation URL : http://localhost:3000/api-docs or https://api.hewi.ml/api-docs
 
 ## Note
 The search endpoint is in the docs as the messages GET with a query param
@@ -18,5 +18,4 @@ Probably it's out of the task scope but i implemented a small fallback system if
 
 ## Extra
 I've also added a CI pipeline using jenkins (i was learning jenkins so thought i'd apply on this task), also out of scope but if interested here's the link: `https://jenkins.hewi.ml`
-username: admin
-password: if interested send an email to amrelhewi@gmail.com, risky adding it here really :D
+if interested send an email to amrelhewi@gmail.com for the credentials, risky adding it here really :D
